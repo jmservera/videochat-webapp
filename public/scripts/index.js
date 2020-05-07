@@ -64,7 +64,10 @@ function updateUserList(socketIds) {
   });
 }
 
-const socket = io.connect("localhost:5000");
+
+const port=location.port===""?"":`:${location.port}`;
+const ssl=location.protocol==="https:"?true:false;
+const socket = io.connect(`${location.hostname}${port}`,{secure:ssl});
 
 socket.on("update-user-list", ({ users }) => {
   updateUserList(users);
