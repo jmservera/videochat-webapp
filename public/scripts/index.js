@@ -100,7 +100,7 @@ socket.on("call-made", async data => {
     new RTCSessionDescription(data.offer)
   );
   const answer = await peerConnection.createAnswer();
-  await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+  await peerConnection.setLocalDescription(answer);
 
   socket.emit("make-answer", {
     answer,
