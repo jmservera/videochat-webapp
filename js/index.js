@@ -6,7 +6,17 @@ const existingCalls = [];
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
-const peerConnection = new RTCPeerConnection();
+var ice_config={
+  iceServers:[
+    {urls:'stun:stun.services.mozilla.com'},
+    {
+    urls:'{{turnServer}}',
+    credential:'{{turnPassword}}',
+    username:'{{turnUser}}'
+  }]
+}
+
+const peerConnection = new RTCPeerConnection(ice_config);
 
 function unselectUsersFromList() {
   const alreadySelectedUser = document.querySelectorAll(

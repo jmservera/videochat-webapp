@@ -3,16 +3,26 @@ import socketIO, { Server as SocketIOServer } from "socket.io";
 import { createServer, Server as HTTPServer } from "http";
 import path from "path";
 
+import crypto from "crypto";
+import fs from "fs";
+
 export class Server {
   private httpServer: HTTPServer;
   private app: Application;
   private io: SocketIOServer;
 
+  private turnUser:string;
+  private turnKey:string;
+  private turnServer:string;
+
   private activeSockets: string[] = [];
 
   private readonly DEFAULT_PORT = 5000;
 
-  constructor() {
+  constructor(server:string, user:string,key:string) {
+    this.turnServer=server;
+    this.turnUser=user;
+    this.turnKey=key;
     this.initialize();
   }
 
@@ -30,10 +40,36 @@ export class Server {
     this.app.use(express.static(path.join(__dirname, "../public")));
   }
 
+
+  private getTURNCredentials(name:string, secret:string):{username:string,password:string}{    
+    var unixTimeStamp:Number = Math.round(Date.now()/1000) + 24*3600,  // this credential would be valid for the next 24 hours
+        username:string = [unixTimeStamp, name].join(':'), password:string,
+        hmac = crypto.createHmac('sha1', secret);
+    hmac.setEncoding('base64');
+    hmac.write(username);
+    hmac.end();
+    password = hmac.read();
+    return {
+        username: username,
+        password: password
+    };
+}
+
   private configureRoutes(): void {
     this.app.get("/", (req, res) => {
       res.sendFile("index.html");
     });
+    this.app.get("/js/index.js", (req,res)=>{
+      var userpwd= this.getTURNCredentials(this.turnUser, this.turnKey);
+      let data=fs.readFileSync('js/index.js');
+      if(data){
+        var script:string = data.toString().replace('{{turnServer}}',this.turnServer)
+                       .replace('{{turnUser}}',userpwd.username)
+                       .replace('{{turnPassword}}',userpwd.password);
+        res.send(script);
+      }
+
+    })
   }
 
   private handleSocketConnection(): void {
