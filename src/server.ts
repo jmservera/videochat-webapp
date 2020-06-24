@@ -60,12 +60,12 @@ export class Server {
       res.sendFile("index.html");
     });
     this.app.get("/js/index.js", (req,res)=>{
-      var userpwd= this.getTURNCredentials(this.turnUser, this.turnKey);
+      var credentials= this.getTURNCredentials(this.turnUser, this.turnKey);
       let data=fs.readFileSync('js/index.js');
       if(data){
         var script:string = data.toString().replace('{{turnServer}}',this.turnServer)
-                       .replace('{{turnUser}}',userpwd.username)
-                       .replace('{{turnPassword}}',userpwd.password);
+                       .replace('{{turnUser}}',credentials.username)
+                       .replace('{{turnPassword}}',credentials.password);
         res.send(script);
       }
 
