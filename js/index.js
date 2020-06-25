@@ -1,4 +1,3 @@
-
 let isAlreadyCalling = false;
 let getCalled = false;
 

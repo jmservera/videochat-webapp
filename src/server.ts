@@ -66,6 +66,7 @@ export class Server {
         var script:string = data.toString().replace('{{turnServer}}',this.turnServer)
                        .replace('{{turnUser}}',credentials.username)
                        .replace('{{turnPassword}}',credentials.password);
+        res.setHeader("Content-Type","text/javascript");
         res.send(script);
       }
 
