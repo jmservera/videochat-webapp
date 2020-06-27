@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "turnServer":{
+            "type": "string",
+            "metadata": {"description":"The DNS name for the turn server"}
+        },
+        "turnAdmin": {
+            "type": "string",
+            "defaultValue": "admin",
+            "metadata": {
+                "description": "Administrator username for the turn server."
+            }
+        },
+        "turnAdminPassword": {
+            "type": "securestring",
+            "defaultValue": "ThisIsThe4dminP$$",
+            "minLength": 8,
+            "metadata": {
+                "description": "Administrator password for the turn server."
+            }
+        }
+    },
+    "variables": {
+        "coturn":"[concat('turn:',parameters('turnServer'),':5389')]"
+    },
+    "resources": []
+}
