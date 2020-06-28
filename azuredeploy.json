@@ -2,6 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "name":{
+            "type":"String",
+            "metadata": {"description":"Base name for all the resources"}
+        },
         "turnServer":{
             "type": "string",
             "metadata": {"description":"The DNS name for the turn server"}
@@ -23,7 +27,78 @@
         }
     },
     "variables": {
-        "coturn":"[concat('turn:',parameters('turnServer'),':5389')]"
+        "coturn":"[concat('turn:',parameters('turnServer'),':5389')]",
+        "serverName": "[toLower(substring(concat('chat',parameters('name'),uniqueString(resourceGroup().id)),0,19))]",
+        "serverFarmName":"[concat(variables('serverName'),'farm')]"
     },
-    "resources": []
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('serverFarmName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "family": "B",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type":"Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name":"[variables('serverName')]",
+            "kind":"app,linux,container",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
+            ],
+            "properties":{
+                "name":"[variables('serverName')]",
+                "serverFarmId":"[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
+
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('serverName'), '/web')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
+            ],
+            "properties": {
+                "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.1.5",
+                "webSocketsEnabled": true,
+                "appSettings":[
+                    {
+                        "name":"TURNSERVER",
+                        "value": "[parameters('coturn')]"
+
+                    },
+                    {
+                        "name":"TURNUSER",
+                        "value": "[variables('turnAdmin')]"
+                    },
+                    {
+                        "name":"TURNKEY",
+                        "value": "[variables('turnAdminPassword')]"
+                    }
+
+                ]
+            }
+        }
+    ]
 }
