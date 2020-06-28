@@ -81,24 +81,22 @@
             ],
             "properties": {
                 "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.1.5",
-                "webSocketsEnabled": true,
-                "appSettings":[
-                    {
-                        "name":"TURNSERVER",
-                        "value": "[variables('coturn')]"
-
-                    },
-                    {
-                        "name":"TURNUSER",
-                        "value": "[parameters('turnAdmin')]"
-                    },
-                    {
-                        "name":"TURNKEY",
-                        "value": "[parameters('turnAdminPassword')]"
-                    }
-
-                ]
+                "webSocketsEnabled": true
             }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-02-01",
+            "name": "[concat(variables('serverName'), '/appsettings')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
+            ],
+            "properties": {
+                        "TURNSERVER": "[variables('coturn')]",
+                        "TURNUSER": "[parameters('turnAdmin')]",
+                        "TURNKEY": "[parameters('turnAdminPassword')]"
+                    }
         }
     ]
 }
