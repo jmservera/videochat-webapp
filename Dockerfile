@@ -1,4 +1,4 @@
-FROM node:14 as builder
+FROM node:14.4.0 as builder
 
 WORKDIR /usr/src
 
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 RUN npm prune --production && rm -r src && rm tsconfig.json
 
-FROM node:14 as runtime
+FROM node:14.4.0-stretch-slim as runtime
 
 WORKDIR /nodeapp
 ENV NODE_ENV=production
