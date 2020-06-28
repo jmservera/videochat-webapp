@@ -85,16 +85,16 @@
                 "appSettings":[
                     {
                         "name":"TURNSERVER",
-                        "value": "[parameters('coturn')]"
+                        "value": "[variables('coturn')]"
 
                     },
                     {
                         "name":"TURNUSER",
-                        "value": "[variables('turnAdmin')]"
+                        "value": "[parameters('turnAdmin')]"
                     },
                     {
                         "name":"TURNKEY",
-                        "value": "[variables('turnAdminPassword')]"
+                        "value": "[parameters('turnAdminPassword')]"
                     }
 
                 ]
