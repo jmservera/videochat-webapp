@@ -67,8 +67,8 @@ export class Server {
       if(data){
         var script:string = data.toString().replace('{{turnServer}}',this.turnServer)
                        .replace('{{turnUser}}',credentials.username)
-                       .replace('{{turnPassword}}',credentials.password,
-                       .replace('{{stunServer}}', this.stunServer));
+                       .replace('{{turnPassword}}',credentials.password)
+                       .replace('{{stunServer}}', this.stunServer);
         res.setHeader("Content-Type","text/javascript");
         res.send(script);
       }

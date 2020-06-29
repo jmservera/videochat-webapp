@@ -81,7 +81,7 @@
                 "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
             ],
             "properties": {
-                "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.1.8",
+                "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.1.9",
                 "webSocketsEnabled": true
             }
         },
