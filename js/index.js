@@ -7,7 +7,7 @@ const { RTCPeerConnection, RTCSessionDescription } = window;
 
 var ice_config={
   iceServers:[
-    {urls:'stun:stun.services.mozilla.com'},
+    {urls:'{{stunServer}}'},
     {
     urls:'{{turnServer}}',
     credential:'{{turnPassword}}',

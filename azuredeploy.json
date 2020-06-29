@@ -28,6 +28,7 @@
     },
     "variables": {
         "coturn":"[concat('turn:',parameters('turnServer'),':5389')]",
+        "stun":"[concat('stun:',parameters('turnServer'),':5389')]",
         "serverName": "[toLower(substring(concat('chat',parameters('name'),uniqueString(resourceGroup().id)),0,19))]",
         "serverFarmName":"[concat(variables('serverName'),'farm')]"
     },
@@ -80,7 +81,7 @@
                 "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
             ],
             "properties": {
-                "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.1.7",
+                "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.1.8",
                 "webSocketsEnabled": true
             }
         },
@@ -94,6 +95,7 @@
             ],
             "properties": {
                         "TURNSERVER": "[variables('coturn')]",
+                        "STUNSERVER": "[variables('stun')]",
                         "TURNUSER": "[parameters('turnAdmin')]",
                         "TURNKEY": "[parameters('turnAdminPassword')]"
                     }

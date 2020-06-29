@@ -14,13 +14,15 @@ export class Server {
   private turnUser:string;
   private turnKey:string;
   private turnServer:string;
+  private stunServer:string;
 
   private activeSockets: string[] = [];
 
   private readonly DEFAULT_PORT = 5000;
 
-  constructor(server:string, user:string,key:string) {
-    this.turnServer=server;
+  constructor(stunServer:string, turnServer:string, user:string,key:string) {
+    this.stunServer=stunServer;
+    this.turnServer=turnServer;
     this.turnUser=user;
     this.turnKey=key;
     this.initialize();
@@ -65,7 +67,8 @@ export class Server {
       if(data){
         var script:string = data.toString().replace('{{turnServer}}',this.turnServer)
                        .replace('{{turnUser}}',credentials.username)
-                       .replace('{{turnPassword}}',credentials.password);
+                       .replace('{{turnPassword}}',credentials.password,
+                       .replace('{{stunServer}}', this.stunServer));
         res.setHeader("Content-Type","text/javascript");
         res.send(script);
       }
