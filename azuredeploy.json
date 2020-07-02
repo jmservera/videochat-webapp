@@ -27,8 +27,8 @@
         }
     },
     "variables": {
-        "coturn":"[concat('turn:',parameters('turnServer'),':5389')]",
-        "stun":"[concat('stun:',parameters('turnServer'),':5389')]",
+        "coturn":"[concat('turn:',parameters('turnServer'),':5349')]",
+        "stun":"[concat('stun:',parameters('turnServer'),':5349')]",
         "serverName": "[toLower(substring(concat('chat',parameters('name'),uniqueString(resourceGroup().id)),0,19))]",
         "serverFarmName":"[concat(variables('serverName'),'farm')]"
     },
