@@ -50,7 +50,17 @@
                 "family": "B",
                 "capacity": 1
             },
-            "kind": "linux"
+            "kind": "linux",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
         },
         {
             "type": "Microsoft.Web/sites",
