@@ -5,15 +5,7 @@ const existingCalls = [];
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
-var ice_config={
-  iceServers:[
-    {urls:'{{stunServer}}'},
-    {
-    urls:'{{turnServer}}',
-    credential:'{{turnPassword}}',
-    username:'{{turnUser}}'
-  }]
-}
+const ice_config={{ice_config}};
 
 const peerConnection = new RTCPeerConnection(ice_config);
 
@@ -52,11 +44,11 @@ function createUserItemContainer(socketId) {
 
 async function callUser(socketId) {
   const offer = await peerConnection.createOffer();
-  await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+  await peerConnection.setLocalDescription(offer);
 
   socket.emit("call-user", {
-    offer,
-    to: socketId
+    'offer': offer,
+    'to': socketId
   });
 }
 
@@ -112,7 +104,7 @@ socket.on("call-made", async data => {
   await peerConnection.setLocalDescription(answer);
 
   socket.emit("make-answer", {
-    answer,
+    answer: answer,
     to: data.socket
   });
   getCalled = true;

@@ -2,11 +2,23 @@ import express, { Application } from "express";
 import socketIO, { Server as SocketIOServer } from "socket.io";
 import { createServer, Server as HTTPServer } from "http";
 import path from "path";
+import util from "util";
 
 import crypto from "crypto";
 import fs from "fs";
 
+export interface IIceServer{
+  urls?:string,
+  credential?:string,
+  username?:string
+};
+
+export interface IIceConfig{
+  iceServers?:Array<IIceServer>
+}
+
 export class Server {
+
   private httpServer: HTTPServer;
   private app: Application;
   private io: SocketIOServer;
@@ -62,13 +74,29 @@ export class Server {
       res.sendFile("index.html");
     });
     this.app.get("/js/index.js", (req,res)=>{
-      var credentials= this.getTURNCredentials(this.turnUser, this.turnKey);
       let data=fs.readFileSync('js/index.js');
       if(data){
-        var script:string = data.toString().replace('{{turnServer}}',this.turnServer)
-                       .replace('{{turnUser}}',credentials.username)
-                       .replace('{{turnPassword}}',credentials.password)
-                       .replace('{{stunServer}}', this.stunServer);
+        var ice_config:IIceConfig={};
+        if(this.turnServer){          
+          ice_config.iceServers=[];
+
+          var iceServer:IIceServer={urls:this.turnServer};
+          if(this.turnUser){
+            var credentials= this.getTURNCredentials(this.turnUser, this.turnKey);
+            iceServer.username=credentials.username;
+            iceServer.credential=credentials.password;            
+          }
+          ice_config.iceServers.push(iceServer);
+        }
+
+        if(this.stunServer){
+          if(ice_config.iceServers==null){
+            ice_config.iceServers=[];
+          }
+          var iceServer:IIceServer={urls:this.stunServer};
+          ice_config.iceServers.push(iceServer);
+        }
+        var script:string = data.toString().replace('{{ice_config}}', util.inspect(ice_config) );
         res.setHeader("Content-Type","text/javascript");
         res.send(script);
       }
