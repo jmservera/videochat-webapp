@@ -18,6 +18,6 @@ ENV NODE_ENV=production
 
 COPY --from=builder /usr/src /nodeapp
 
-EXPOSE 5000
+EXPOSE 8080
 
 CMD ["node", "app/index.js"]

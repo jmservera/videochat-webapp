@@ -30,7 +30,7 @@ export class Server {
 
   private activeSockets: string[] = [];
 
-  private readonly DEFAULT_PORT = 5000;
+  private readonly DEFAULT_PORT = 8080;
 
   constructor(stunServer:string, turnServer:string, user:string,key:string) {
     this.stunServer=stunServer;

@@ -75,7 +75,22 @@
                 "name": "[variables('serverName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
 
+            },
+            "resources": [
+                {
+                "apiVersion": "2018-11-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                  "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+                ],
+                "properties": {
+                  "RepoUrl": "[parameters('repoURL')]",
+                  "branch": "[parameters('branch')]",
+                  "IsManualIntegration": true
+                }
             }
+            ]
         },
         {
             "type": "Microsoft.Web/sites/config",
