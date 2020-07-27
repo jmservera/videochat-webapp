@@ -1,0 +1,132 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "String",
+            "metadata": { "description": "Base name for all the resources" }
+        },
+        "turnServer": {
+            "type": "string",
+            "metadata": { "description": "The DNS name for the turn server" }
+        },
+        "turnAdmin": {
+            "type": "string",
+            "defaultValue": "admin",
+            "metadata": {
+                "description": "Administrator username for the turn server."
+            }
+        },
+        "turnAdminPassword": {
+            "type": "securestring",
+            "minLength": 8,
+            "metadata": {
+                "description": "Administrator password for the turn server."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The location in which the resources should be deployed."
+            }
+        },
+        "repoURL": {
+            "type": "string",
+            "defaultValue":"https://github.com/jmservera/videochat-webapp"
+        },
+        "branch": {
+            "type": "string",
+            "defaultValue":"turnserver"
+        }
+    },
+    "variables": {
+        "coturn": "[concat('turn:',parameters('turnServer'),':5349')]",
+        "stun": "[concat('stun:',parameters('turnServer'),':5349')]",
+        "serverName": "[toLower(substring(concat('chat',parameters('name'),uniqueString(resourceGroup().id)),0,19))]",
+        "serverFarmName": "[concat(variables('serverName'),'farm')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2019-08-01",
+            "name": "[variables('serverFarmName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "family": "B",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[variables('serverName')]",
+            "kind": "app,linux",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
+            ],
+            "properties": {
+                "name": "[variables('serverName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
+
+            },
+            "resources": [
+                {
+                "apiVersion": "2018-11-01",
+                "name": "web",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                  "[resourceId('Microsoft.Web/Sites', variables('serverName'))]"
+                ],
+                "properties": {
+                  "RepoUrl": "[parameters('repoURL')]",
+                  "branch": "[parameters('branch')]",
+                  "IsManualIntegration": true
+                }
+            }
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('serverName'), '/web')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
+            ],
+            "properties": {
+                "linuxFxVersion": "NODE|12-lts",
+                "webSocketsEnabled": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-02-01",
+            "name": "[concat(variables('serverName'), '/appsettings')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
+            ],
+            "properties": {
+                "TURNSERVER": "[variables('coturn')]",
+                "STUNSERVER": "[variables('stun')]",
+                "TURNUSER": "[parameters('turnAdmin')]",
+                "TURNKEY": "[parameters('turnAdminPassword')]"
+            }
+        }
+    ]
+}

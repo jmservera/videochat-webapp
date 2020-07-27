@@ -1,15 +1,23 @@
-FROM node:14
+FROM node:14.4.0 as builder
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src
 
 COPY package*.json ./
 
-RUN npm ci --only=production
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
+RUN npm prune --production && rm -r src && rm tsconfig.json
 
-EXPOSE 5000
+FROM node:14.4.0-stretch-slim as runtime
 
-CMD ["node", "lib/index.js"]
+WORKDIR /nodeapp
+ENV NODE_ENV=production
+
+COPY --from=builder /usr/src /nodeapp
+
+EXPOSE 8080
+
+CMD ["node", "app/index.js"]
