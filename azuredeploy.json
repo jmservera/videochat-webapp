@@ -29,6 +29,14 @@
             "metadata": {
                 "description": "The location in which the resources should be deployed."
             }
+        },
+        "repoURL": {
+            "type": "string",
+            "defaultValue":"https://github.com/jmservera/videochat-webapp"
+        },
+        "branch": {
+            "type": "string",
+            "defaultValue":"turnserver"
         }
     },
     "variables": {
@@ -66,7 +74,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
             "name": "[variables('serverName')]",
-            "kind": "app,linux,container",
+            "kind": "app,linux",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
@@ -82,7 +90,7 @@
                 "name": "web",
                 "type": "sourcecontrols",
                 "dependsOn": [
-                  "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+                  "[resourceId('Microsoft.Web/Sites', variables('serverName'))]"
                 ],
                 "properties": {
                   "RepoUrl": "[parameters('repoURL')]",
@@ -101,7 +109,7 @@
                 "[resourceId('Microsoft.Web/sites', variables('serverName'))]"
             ],
             "properties": {
-                "linuxFxVersion": "DOCKER|jmservera/videochat-demo:0.2.1",
+                "linuxFxVersion": "NODE|12-lts",
                 "webSocketsEnabled": true
             }
         },

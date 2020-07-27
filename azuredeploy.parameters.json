@@ -10,6 +10,9 @@
         },
         "turnAdminPassword": {
             "value": "ThisIsTheP4$$w0rd"
+        },
+        "location":{
+            "value": "northeurope"
         }
     }
 }
