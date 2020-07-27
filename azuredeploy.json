@@ -36,7 +36,7 @@
         },
         "branch": {
             "type": "string",
-            "defaultValue":"turnserver"
+            "defaultValue":"main"
         }
     },
     "variables": {
